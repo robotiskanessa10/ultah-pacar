@@ -1,0 +1,402 @@
+html_content = """<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday, My Love 🌹</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; scroll-behavior: smooth; }
+        body { background-color: #0d0406; color: #f9ecec; font-family: 'Lato', sans-serif; overflow-x: hidden; position: relative; }
+        h1, h2, h3 { font-family: 'Playfair Display', serif; }
+        
+        /* Persistent Background Ornaments to fill empty space */
+        #bg-ornaments {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .floating-ornament {
+            position: absolute;
+            bottom: -5vh;
+            pointer-events: none;
+            user-select: none;
+            opacity: 0.3;
+        }
+        @keyframes floatUpBg {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* Intro Screen */
+        #intro-screen {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: radial-gradient(circle, #2a0812 0%, #0d0406 100%);
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 100;
+            transition: opacity 1.5s ease-in-out;
+        }
+        
+        /* Intro Gallery (3 Photos) */
+        .intro-gallery {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 25px;
+            z-index: 2;
+        }
+        .intro-gallery img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #ffb3c6;
+            box-shadow: 0 0 20px rgba(255, 179, 198, 0.4);
+            margin: 0 -15px; /* Overlapping */
+            transition: 0.3s;
+            animation: floatBob 3s infinite alternate ease-in-out;
+        }
+        .intro-gallery img:nth-child(1) { transform: rotate(-10deg); animation-delay: 0s; z-index: 1; }
+        .intro-gallery img:nth-child(2) { width: 120px; height: 120px; transform: translateY(-15px); z-index: 3; animation-delay: 1s; border-color: #ff3366;}
+        .intro-gallery img:nth-child(3) { transform: rotate(10deg); animation-delay: 2s; z-index: 2; }
+        
+        @keyframes floatBob {
+            0% { transform: translateY(0px) rotate(var(--r, 0deg)); }
+            100% { transform: translateY(-10px) rotate(var(--r, 0deg)); }
+        }
+
+        #intro-screen h1 { font-size: 32px; color: #ff3366; margin-bottom: 10px; text-shadow: 0 0 15px rgba(255, 51, 102, 0.6); text-align: center; padding: 0 20px;}
+        .nama-pacar { color: #ffb3c6; font-size: 48px; font-style: italic; display: block; margin-top: 5px; text-shadow: 0 0 20px rgba(255, 179, 198, 0.8);}
+        .intro-subtitle { margin-bottom: 30px; font-size: 16px; color: #ffccd5; font-style: italic; opacity: 0.8;}
+        
+        .btn-buka {
+            background: linear-gradient(45deg, #cc0000, #ff3366); color: white;
+            border: none; padding: 15px 40px; font-size: 18px;
+            font-family: 'Playfair Display', serif; border-radius: 50px;
+            cursor: pointer; box-shadow: 0 0 25px rgba(204, 0, 0, 0.6);
+            transition: 0.4s; letter-spacing: 1px; z-index: 2;
+        }
+        .btn-buka:hover { transform: scale(1.08); box-shadow: 0 0 35px rgba(255, 51, 102, 0.9); }
+
+        /* Massive Flower Pop-up Overlay (SLOW & NATURAL) */
+        #flower-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none; z-index: 9999; display: flex; flex-wrap: wrap;
+            justify-content: center; align-content: center; overflow: hidden;
+        }
+        .flower-burst {
+            position: absolute;
+            font-size: 40px;
+            opacity: 0;
+            transform: scale(0) translate(0, 0) rotate(0deg);
+            animation: explode 8s ease-out forwards;
+            text-shadow: 0 0 15px rgba(255,51,102,0.8);
+        }
+        @keyframes explode {
+            0% { transform: scale(0) translate(0, 0) rotate(0deg); opacity: 0; }
+            5% { opacity: 1; }
+            25% { opacity: 1; transform: scale(var(--s)) translate(var(--tx), var(--ty)) rotate(var(--rot)); }
+            60% { opacity: 0.9; transform: scale(var(--s)) translate(calc(var(--tx) + var(--driftX)), calc(var(--ty) + 15vh)) rotate(calc(var(--rot) + 45deg)); }
+            100% { opacity: 0; transform: scale(var(--s)) translate(calc(var(--tx) + (var(--driftX) * 1.5)), calc(var(--ty) + 100vh)) rotate(calc(var(--rot) + 90deg)); }
+        }
+
+        /* Main Content Sections */
+        #main-content { display: none; opacity: 0; transition: opacity 2s ease-in-out; position: relative; z-index: 10;}
+        .slide { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 80px 20px; text-align: center; position: relative; }
+        
+        /* CUTE ORNAMENTS ON CARDS */
+        .card {
+            background: rgba(30, 10, 15, 0.7);
+            border: 2px solid #ff3366;
+            padding: 40px; border-radius: 20px;
+            box-shadow: 0 0 40px rgba(204, 0, 0, 0.3);
+            max-width: 800px; backdrop-filter: blur(10px);
+            width: 100%; position: relative;
+        }
+        /* Bows on corners */
+        .card::before { content: '🎀'; position: absolute; top: -15px; left: -15px; font-size: 30px; transform: rotate(-15deg); animation: wobble 2s infinite ease-in-out; }
+        .card::after { content: '✨'; position: absolute; bottom: -15px; right: -15px; font-size: 30px; animation: pulse 1.5s infinite; }
+        
+        @keyframes wobble { 0%, 100% { transform: rotate(-15deg); } 50% { transform: rotate(5deg); } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.2); opacity: 1; } }
+
+        .card h2 { color: #ff3366; font-size: 34px; margin-bottom: 25px; text-shadow: 0 0 10px rgba(255, 51, 102, 0.4);}
+        .card p { font-size: 18px; line-height: 1.8; margin-bottom: 15px; color: #ffccd5; }
+        
+        /* Slider / Timeline */
+        .timeline-item { margin: 25px 0; padding: 20px; border-left: 4px dashed #ff3366; text-align: left; background: rgba(255, 51, 102, 0.05); border-radius: 0 10px 10px 0; position: relative;}
+        .timeline-item::before { content: '💖'; position: absolute; left: -14px; top: 20px; font-size: 14px; background: #0d0406; border-radius: 50%;}
+        .timeline-item h3 { color: #ff6699; margin-bottom: 10px; font-size: 22px; }
+        .timeline-item p { margin-bottom: 0; font-size: 16px; }
+
+        /* Polaroid / Highlight Photo */
+        .polaroid {
+            background: #fff; padding: 15px 15px 40px 15px; border-radius: 5px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); transform: rotate(-3deg);
+            max-width: 350px; margin: 30px auto; border: 2px solid #ff3366; position: relative;
+        }
+        /* Cute tape on polaroid */
+        .polaroid::before {
+            content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%) rotate(-2deg);
+            width: 100px; height: 25px; background: rgba(255, 179, 198, 0.7); box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .polaroid img { width: 100%; height: auto; border-radius: 3px; filter: brightness(0.9); }
+        .polaroid p { color: #0d0406 !important; font-family: 'Playfair Display', serif; font-size: 20px !important; margin-top: 15px; font-style: italic; font-weight: bold;}
+
+        /* Galeri */
+        .galeri-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px; max-width: 1000px; width: 100%; margin-top: 30px;
+        }
+        .foto-item { height: 280px; border-radius: 12px; overflow: hidden; border: 2px solid #ff3366; position: relative; }
+        .foto-item img { width: 100%; height: 100%; object-fit: cover; transition: 0.6s; filter: brightness(0.85); }
+        .foto-item img:hover { transform: scale(1.15) rotate(2deg); filter: brightness(1.1); }
+        .foto-item::after { content: ''; position: absolute; top:0; left:0; right:0; bottom:0; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); pointer-events: none;}
+
+        #music-btn { position: fixed; bottom: 25px; right: 25px; background: #cc0000; color: white; border: 2px solid #ff3366; border-radius: 50%; width: 55px; height: 55px; font-size: 22px; cursor: pointer; box-shadow: 0 0 20px rgba(204, 0, 0, 0.8); z-index: 99; transition: 0.3s; }
+        #music-btn:hover { background: #ff3366; transform: scale(1.1); }
+        
+        /* Scroll Animations */
+        .reveal { opacity: 0; transform: translateY(60px); transition: all 1.2s cubic-bezier(0.5, 0, 0, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body>
+    <!-- Persistent Cute Background -->
+    <div id="bg-ornaments"></div>
+
+    <div id="intro-screen">
+        <!-- New Gallery at Intro -->
+        <div class="intro-gallery">
+            <img src="foto-intro1.jpg" alt="Memori 1" style="--r: -10deg;">
+            <img src="foto-intro2.jpg" alt="Memori Utama" style="--r: 0deg;">
+            <img src="foto-intro3.jpg" alt="Memori 3" style="--r: 10deg;">
+        </div>
+
+        <h1>Ada sesuatu untukmu,<br><span class="nama-pacar">Panggilan Sayangnya</span></h1>
+        <p class="intro-subtitle">Pesan kecil dari seseorang yang beruntung memilikimu...</p>
+        
+        <button class="btn-buka" onclick="bukaKado()">Buka Hatinya ❤️</button>
+    </div>
+
+    <!-- Container for Massive Flower Explosion -->
+    <div id="flower-overlay"></div>
+
+    <div id="main-content">
+        <!-- Slide 1: Welcome -->
+        <div class="slide">
+            <div class="card reveal">
+                <h2>Happy Birthday, Cintaku 🌹</h2>
+                <p>Selamat bertambah usia untuk seseorang yang selalu menjadi terang di saat gelap, dan kehangatan di saat dingin.</p>
+                <p style="font-size: 14px; opacity: 0.7; margin-top: 30px; color: #ff6699;">( Scroll ke bawah pelan-pelan ya... 👇 )</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Timeline / Romantis -->
+        <div class="slide" style="background: radial-gradient(circle, rgba(204,0,0,0.15) 0%, rgba(13,4,6,1) 80%);">
+            <div class="card reveal" style="max-width: 700px;">
+                <h2>Kenapa Aku Bersyukur Memilikimu?</h2>
+                <div class="timeline-item">
+                    <h3>1. Senyummu ✨</h3>
+                    <p>Senyummu selalu berhasil membuat hari-hariku yang berat terasa jauh lebih ringan dan mudah dilewati.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3>2. Kesabaranmu 🤍</h3>
+                    <p>Terima kasih sudah selalu sabar menghadapiku, mengerti kekuranganku, dan selalu ada di setiap langkahku.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3>3. Cinta Kita 🌹</h3>
+                    <p>Setiap detik bersamamu adalah kenangan manis yang ingin aku ulang dan simpan selamanya.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Special Memory -->
+        <div class="slide">
+            <div class="card reveal" style="background: rgba(40, 5, 10, 0.8);">
+                <h2>Satu Momen Favoritku... 🦋</h2>
+                <p>Kalau ditanya momen apa yang paling aku suka, jawabannya adalah setiap detik saat aku bisa menatap matamu dan sadar bahwa aku memilikimu.</p>
+                
+                <div class="polaroid">
+                    <img src="foto-spesial.jpg" alt="Foto Spesial">
+                    <p>My Favorite Person ❤️</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Surat Cinta -->
+        <div class="slide" style="background: linear-gradient(135deg, rgba(13,4,6,1) 0%, rgba(60,0,20,0.8) 100%);">
+            <div class="card reveal">
+                <h2>Untuk Kamu... 💌</h2>
+                <p>Di hari yang sangat spesial ini, aku cuma mau bilang terima kasih. Terima kasih sudah hadir, bertahan, dan menjadi alasan di balik banyak senyumanku.</p>
+                <p>Semoga tahun ini membawa lebih banyak tawa, kebahagiaan yang tak terduga, dan jalan yang lebih mudah untuk semua mimpimu.</p>
+                <p>Apapun yang terjadi ke depannya, ingat ya, aku akan selalu ada di sini. Memegang tanganmu erat-erat.</p>
+                <p style="margin-top: 25px; font-size: 22px;"><b>I love you, today, tomorrow, and all the days after. ❤️</b></p>
+            </div>
+        </div>
+
+        <!-- Slide 5: Janji Kecil -->
+        <div class="slide">
+            <div class="card reveal" style="max-width: 700px;">
+                <h2>Beberapa Janji Kecilku 🤞</h2>
+                <div class="timeline-item">
+                    <h3>💕 Akan selalu berusaha</h3>
+                    <p>Aku berjanji akan selalu berusaha menjadi pendengar yang baik untuk setiap cerita bahagiamu dan keluh kesahmu.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3>💕 Genggaman Tangan</h3>
+                    <p>Aku nggak akan pernah ragu untuk menggenggam tanganmu di saat kamu merasa sendirian atau takut.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3>💕 Nggak Akan Bosan</h3>
+                    <p>Telingamu mungkin akan bosan, tapi aku nggak akan pernah bosan bilang kalau aku sangat mencintaimu.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Galeri -->
+        <div class="slide" style="background: linear-gradient(180deg, rgba(13,4,6,1) 0%, rgba(51,0,17,1) 50%, rgba(13,4,6,1) 100%);">
+            <h2 class="reveal" style="color:#ff3366; font-size:40px; margin-bottom:10px; text-shadow: 0 0 15px rgba(255,51,102,0.5);">Jejak Kenangan Kita 📸</h2>
+            <p class="reveal" style="color:#ffccd5; margin-bottom:40px; font-size: 18px;">(Sebagian kecil dari banyaknya bahagia bersamamu)</p>
+            <div class="galeri-grid reveal">
+                <div class="foto-item"><img src="foto1.jpg" alt="Memori 1"></div>
+                <div class="foto-item"><img src="foto2.jpg" alt="Memori 2"></div>
+                <div class="foto-item"><img src="foto3.jpg" alt="Memori 3"></div>
+                <div class="foto-item"><img src="foto4.jpg" alt="Memori 4"></div>
+                <div class="foto-item"><img src="foto5.jpg" alt="Memori 5"></div>
+                <div class="foto-item"><img src="foto6.jpg" alt="Memori 6"></div>
+                <div class="foto-item"><img src="foto7.jpg" alt="Memori 7"></div>
+                <div class="foto-item"><img src="foto8.jpg" alt="Memori 8"></div>
+            </div>
+        </div>
+        
+        <!-- Slide 7: Penutup -->
+        <div class="slide">
+            <div class="card reveal" style="text-align: center; border-color: transparent; box-shadow: none; background: transparent;">
+                <h2 style="font-size: 55px; text-shadow: 0 0 25px rgba(255,51,102,0.8);">Happy Birthday! 🥂</h2>
+                <p style="font-size: 20px;">Sekarang, tiup lilinnya (dalam hati) dan buat permintaan yang paling indah.</p>
+                <p style="font-size: 32px; color: #ffb3c6; margin-top: 20px; font-weight: bold; font-style: italic;">[Nama Pacarmu]</p>
+                <p style="font-size: 32px; color: #ff3366; margin-top: 10px; font-weight: bold; text-shadow: 0 0 15px rgba(255,51,102,0.6);">I Love You So Much! ❤️</p>
+                <div style="font-size: 60px; margin-top: 20px; animation: heartbeat 1.5s infinite;">❤️</div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bgm" src="lagu.mp3" loop></audio>
+    <button id="music-btn" onclick="toggleMusic()">🎵</button>
+
+    <style>
+        @keyframes heartbeat { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+    </style>
+
+    <script>
+        // INISIALISASI ORNAMEN BACKGROUND AGAR TIDAK SEPI
+        function mulaiOrnamenBackground() {
+            const container = document.getElementById('bg-ornaments');
+            const emojis = ['✨', '💖', '🎀', '🌸', '🦋'];
+            
+            setInterval(() => {
+                let orn = document.createElement("div");
+                orn.className = "floating-ornament";
+                orn.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                orn.style.left = Math.random() * 100 + "vw";
+                orn.style.fontSize = (Math.random() * 15 + 10) + "px";
+                
+                // Durasi mengambang ke atas acak antara 6 sampai 12 detik
+                let durasi = Math.random() * 6 + 6;
+                orn.style.animation = `floatUpBg ${durasi}s linear forwards`;
+                
+                container.appendChild(orn);
+                
+                // Bersihkan setelah animasi selesai
+                setTimeout(() => { orn.remove(); }, durasi * 1000);
+            }, 600); // Munculin ornamen baru setiap 0.6 detik terus menerus
+        }
+        
+        // Jalankan ornamen sejak awal buka web
+        mulaiOrnamenBackground();
+
+        function bukaKado() {
+            let lagu = document.getElementById("bgm");
+            lagu.play();
+            
+            ledakanBungaSeluruhLayar();
+
+            let intro = document.getElementById("intro-screen");
+            let main = document.getElementById("main-content");
+            
+            // Sembunyikan tombol biar fokus ke bunga
+            document.querySelector('.btn-buka').style.display = 'none';
+            intro.querySelector('h1').style.display = 'none';
+            intro.querySelector('.intro-gallery').style.display = 'none';
+            intro.querySelector('.intro-subtitle').style.display = 'none';
+
+            setTimeout(() => {
+                intro.style.opacity = "0";
+                setTimeout(() => {
+                    intro.style.display = "none";
+                    main.style.display = "block";
+                    setTimeout(() => { main.style.opacity = "1"; reveal(); }, 100);
+                }, 1500);
+            }, 4500); 
+        }
+
+        function ledakanBungaSeluruhLayar() {
+            const overlay = document.getElementById("flower-overlay");
+            const bungaEmojis = ['🌹', '🥀', '🌺', '❤️', '✨', '🌸', '💖', '🦋'];
+            
+            for (let i = 0; i < 220; i++) {
+                let bunga = document.createElement("div");
+                bunga.className = "flower-burst";
+                bunga.innerText = bungaEmojis[Math.floor(Math.random() * bungaEmojis.length)];
+                
+                bunga.style.left = "50vw";
+                bunga.style.top = "50vh";
+
+                let angle = Math.random() * Math.PI * 2; 
+                let distance = Math.random() * 70 + 10; 
+                
+                let tx = Math.cos(angle) * distance + "vw";
+                let ty = Math.sin(angle) * distance + "vh";
+                let driftX = (Math.random() - 0.5) * 40 + "vw";
+                let scale = Math.random() * 1.5 + 0.8; 
+                let rot = Math.random() * 360 + "deg";
+
+                bunga.style.setProperty('--tx', tx);
+                bunga.style.setProperty('--ty', ty);
+                bunga.style.setProperty('--driftX', driftX);
+                bunga.style.setProperty('--s', scale);
+                bunga.style.setProperty('--rot', rot);
+
+                bunga.style.animationDelay = (Math.random() * 1.5) + "s";
+                overlay.appendChild(bunga);
+            }
+        }
+
+        function toggleMusic() {
+            let lagu = document.getElementById("bgm");
+            if (lagu.paused) lagu.play();
+            else lagu.pause();
+        }
+
+        window.addEventListener('scroll', reveal);
+        function reveal() {
+            var reveals = document.querySelectorAll('.reveal');
+            for (var i = 0; i < reveals.length; i++) {
+                var windowheight = window.innerHeight;
+                var revealtop = reveals[i].getBoundingClientRect().top;
+                var revealpoint = 120;
+                if (revealtop < windowheight - revealpoint) {
+                    reveals[i].classList.add('active');
+                }
+            }
+        }
+    </script>
+</body>
+</html>"""
+
+with open('/mnt/data/kado_bucin_dark_v4.html', 'w', encoding='utf-8') as f:
+    f.write(html_content)
+
+print("File created: kado_bucin_dark_v4.html")
